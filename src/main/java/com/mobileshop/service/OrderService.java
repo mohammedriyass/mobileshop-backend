@@ -38,7 +38,6 @@ public class OrderService {
         order.setPaymentMethod(dto.getPaymentMethod());
         order.setTotalAmount(mobile.getSellingPrice());
 
-        // If COD → mark mobile as sold immediately
         if (dto.getPaymentMethod().equals("COD")) {
             order.setOrderStatus("CONFIRMED");
             mobile.setStatus("SOLD");
