@@ -33,7 +33,7 @@ public class SecurityConfig {
                         .requestMatchers("GET", "/api/mobiles/{id}").permitAll()
                         .requestMatchers("GET", "/api/mobiles/search").permitAll()
                         .requestMatchers("POST", "/api/orders").permitAll()
-
+                        .requestMatchers("/api/payment/**").permitAll()
                         // Everything else needs authentication
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);

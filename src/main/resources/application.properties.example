@@ -11,3 +11,7 @@ server.port=8080
 spring.application.name=mobileshop-backend
 
 spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+# Razorpay
+razorpay.key.id=YOUR_KEY_ID_HERE
+razorpay.key.secret=YOUR_KEY_SECRET_HERE
