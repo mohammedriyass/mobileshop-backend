@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Service
 public class InvoiceService {
@@ -27,10 +28,14 @@ public class InvoiceService {
 
     public InvoiceResponseDTO generateInvoice(InvoiceRequestDTO dto) {
 
-        if (invoiceRepository.findByOrderId(dto.getOrderId()).isPresent()) {
-            throw new RuntimeException("Invoice already generated for this order!");
+        // Check if invoice already exists for this order
+        // If yes → return existing invoice instead of error!
+        Optional<Invoice> existingInvoice = invoiceRepository.findByOrderId(dto.getOrderId());
+        if (existingInvoice.isPresent()) {
+            return mapToResponse(existingInvoice.get());
         }
 
+        // Rest of the code remains same...
         Order order = orderRepository.findById(dto.getOrderId())
                 .orElseThrow(() -> new RuntimeException("Order not found!"));
 
@@ -39,9 +44,9 @@ public class InvoiceService {
         invoice.setInvoiceNumber(generateInvoiceNumber());
         invoice.setCustomerName(order.getCustomerName());
         invoice.setCustomerPhone(order.getCustomerPhone());
-        invoice.setMobileDetails(order.getMobile().getBrand() + " " + order.getMobile().getModel() +
-                " (" + order.getMobile().getStorage() + ", " + order.getMobile().getColor() + ")");
-
+        invoice.setMobileDetails(
+                order.getMobile().getBrand() + " " + order.getMobile().getModel() +
+                        " (" + order.getMobile().getStorage() + ", " + order.getMobile().getColor() + ")");
         invoice.setTotalAmount(order.getTotalAmount());
 
         Invoice saved = invoiceRepository.save(invoice);
@@ -51,7 +56,7 @@ public class InvoiceService {
             saved.setPdfPath(pdfPath);
             saved = invoiceRepository.save(saved);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to generate PDF:" + e.getMessage());
+            throw new RuntimeException("Failed to generate PDF: " + e.getMessage());
         }
 
         return mapToResponse(saved);
